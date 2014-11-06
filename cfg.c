@@ -1,10 +1,9 @@
-/*
+/**
  * cfg.c
  *
  *  Created on: Nov 6, 2014
  *      Author: wus
  */
-
 
 #include <stdio.h>
 #include <string.h>
@@ -31,7 +30,7 @@ typedef struct {
 
 typedef union {
 	n node;
-	nlist list;
+	nlist list; // WTF: does root have to be listed here? might cause nasty problems but it works now. Strange.
 } node_u;
 
 typedef struct {
@@ -168,7 +167,7 @@ int node_dump(node_t* root, int indent) {
 	
 	// no children? simple key/value pair
 	if (root->has_children == 0) {
-		printf("%s%s = %s\n", ind, root->data->node.name, root->data->node.value);
+		printf("%s%s %s\n", ind, root->data->node.name, root->data->node.value);
 		return 0;
 	}
 	
@@ -206,7 +205,8 @@ int node_dump(node_t* root, int indent) {
 	return 0;
 }
 
-int main(int argc, char* argv[]) {
+void test_createnode() {
+	
 	//printf("%d\n", nodeid);
 	
 	node_t* root = init_root(); 
@@ -271,5 +271,58 @@ int main(int argc, char* argv[]) {
 	
 	node_dump(root, 0);
 	
+}
+
+int parse_config_file(const char* filename) {
+	
+	printf("Parsing %s\n\n", filename);
+	
+	// get a file handle
+	FILE* fp = fopen(filename, "r");
+	if (fp == NULL) {
+		fprintf(stderr, "%s : ", filename);
+		perror("");
+		return 2;
+	}
+	
+	node_t* root = init_root();
+	
+	// parse file
+	// 
+	// loop over the file character by character
+	// '<' is the beginning of a directive name
+	// "</" is the beginning of the end of a directive name
+	// '>' tag end
+	// name/value pairs are separated by 1 or more spaces or tabs
+	
+	
+	// handle utf8 characters
+	// see explanation here: 
+	// http://stackoverflow.com/questions/21737906/how-to-read-write-utf8-text-files-in-c
+	
+	
+	// close file handle
+	int ret = fclose(fp);
+	if (ret != 0) {
+		fprintf(stderr, "Failed to close %s : ", filename);
+		perror("");
+		return 2;
+	}
+	
 	return 0;
+}
+
+int main(int argc, char* argv[]) {
+	
+	//test_createnode();
+	
+	// we expect command line parameter #1 to be a config file to parse
+	if (argc != 2) {
+		fprintf(stderr, "usage: %s [configfile]\n", argv[0]);
+		exit(1);
+	}
+	
+	int ret = parse_config_file(argv[1]);
+	
+	return ret;
 }
