@@ -296,9 +296,47 @@ int parse_config_file(const char* filename) {
 	// name/value pairs are separated by 1 or more spaces or tabs
 	
 	
-	// handle utf8 characters
+	// TODO: handle utf8 characters
 	// see explanation here: 
 	// http://stackoverflow.com/questions/21737906/how-to-read-write-utf8-text-files-in-c
+	
+	char c;
+	char line[1024] = "";
+	int line_pos = 0;
+	int first_space = -1;
+	int found_char = -1;
+	
+	while ((c = fgetc(fp)) != EOF) {
+		
+		// scan line by line
+		if (c != '\n') {
+			//printf("%d %c ", line_pos, c);
+			line[line_pos] = c;
+			line[line_pos+1] = '\0';
+			
+			if (found_char == -1) {
+				if (c != ' ' && c != '\t' && c != '\n' && c != '\r')
+					found_char = line_pos;
+			} else {
+				if ((c == ' ' || c == '\t') && first_space == -1)
+					first_space = line_pos;
+			}
+			
+			line_pos++;
+			
+			continue;
+		}
+		
+		
+		printf("%d %d -%s\n", found_char, first_space, line);
+		line_pos = 0;
+		first_space = -1;
+		found_char = -1;
+		line[0] = '\0';
+		
+		
+		// printf("%c", c);
+	}
 	
 	
 	// close file handle
