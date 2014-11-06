@@ -4,6 +4,8 @@ CC      = gcc
 CCFLAGS = -Wall -O3 
 RM      = rm
 
+all: cfg
+
 cfg:
 	$(CC) $(CCFLAGS) -o cfg cfg.c
 
