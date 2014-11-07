@@ -1,10 +1,13 @@
 .PHONY: cfg parray.o tokenize tokenize.o
 
 CC      = gcc
-CCFLAGS = -Wall -O3 
+#CCFLAGS = -Wall -O3 
+CCFLAGS = -Wall -g -O0 
 RM      = rm
 
-all: cfg
+all: cfg tokenize
+
+debug:
 
 cfg: parray.o tokenize.o
 	$(CC) $(CCFLAGS) parray.o tokenize.o -o cfg cfg.c
