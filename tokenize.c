@@ -16,7 +16,7 @@
 #endif
 
 /**
- * Split string by susequent spaces
+ * Split string by characters defined in whitespace
  *
  * returns the number of elements
  */

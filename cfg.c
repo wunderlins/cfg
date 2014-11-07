@@ -309,6 +309,7 @@ int parse_config_file(const char* filename) {
 	while ((c = fgetc(fp)) != EOF) {
 		
 		// scan line by line
+		// FIXME: also take into account '\r' and "\r\n"
 		if (c != '\n') {
 			//printf("%d %c ", line_pos, c);
 			line[line_pos] = c;
@@ -318,12 +319,14 @@ int parse_config_file(const char* filename) {
 			continue;
 		}
 		
+		// split string by ' ' and '\t' and store it in a pointer array
+		// pointer type is char*
 		parray* tokens = parray_init(sizeof(char), 10);
 		tokenize(tokens, line, " \t");
 		
-		// FIXME: free allocated memory from tokenizer properly
+		// TODO: generate tokens also for white space
 		
-		//printf("num tokens: %ld -%s\n", tokens->length, line);
+		// debug output of all tokens
 		if (tokens->length) {
 			printf("%ld:", tokens->length);
 			int i=0;
@@ -338,6 +341,8 @@ int parse_config_file(const char* filename) {
 		
 		// printf("%c", c);
 	}
+	
+	// FIXME: free allocated memory from tokenizer properly
 	
 	// close file handle
 	int ret = fclose(fp);
