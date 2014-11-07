@@ -17,12 +17,17 @@
 
 /**
  * Split string by characters defined in whitespace
- *
+ * 
+ * TODO: if a line ends with a '\\' the directive is continued on the next line
+ * TODO: find a way to preserve whitespace
+ * TODO: concatenate comments beginning with '#' and ending at the end of 
+ *       the line into one token 
+ * 
  * returns the number of elements
  */
 int tokenize(parray* result, char* string, char* whitespace) {
 	
-	char last;
+	char current;
 	int i = 0;
 	int word = 0;
 	int length = strlen(string);
@@ -33,13 +38,13 @@ int tokenize(parray* result, char* string, char* whitespace) {
 	// loop over the array character by character
 	//printf("str: %s\n", string);
 	for (i=0; i<length; i++) {
-		last = string[i];
+		current = string[i];
 		
 		// check if the current character is a delimiter
 		int n = 0;
 		int is_whitespace = 0;
 		for(n=0; n<whitespace_length; n++) {
-			if (last == whitespace[n]) {
+			if (current == whitespace[n]) {
 				is_whitespace = 1;
 				break;
 			}
@@ -65,7 +70,7 @@ int tokenize(parray* result, char* string, char* whitespace) {
 		
 		// remember character
 		// FIXME: check fo buffer overruns
-		buffer[buffer_l++] = last;
+		buffer[buffer_l++] = current;
 		buffer[buffer_l] = '\0';
 	}
 	
