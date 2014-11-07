@@ -1,4 +1,4 @@
-.PHONY: cfg parray.o tokenize
+.PHONY: cfg parray.o tokenize tokenize.o
 
 CC      = gcc
 CCFLAGS = -Wall -O3 
@@ -12,8 +12,11 @@ cfg:
 parray.o:
 	$(CC) $(CCFLAGS) -c parray.c
 
+tokenize.o: parray.o
+	$(CC) $(CCFLAGS) -DTOKENIZE_TESTCASE=0 -c tokenize.c
+
 tokenize: parray.o
-	$(CC) $(CCFLAGS) parray.o -o tokenize tokenize.c
+	$(CC) $(CCFLAGS) -DTOKENIZE_TESTCASE=1 parray.o -o tokenize tokenize.c
 
 diff:
 	git diff | colordiff | less -R
@@ -22,5 +25,7 @@ diff:
 clean:
 	$(RM) cfg || true
 	$(RM) parray.o || true
+	$(RM) tokenize.o || true
+	$(RM) tokenize || true
 	$(RM) *~
 

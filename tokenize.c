@@ -11,7 +11,9 @@
 #include <stdlib.h>
 #include "parray.h"
 
-#define MIN_SPACES 1
+#ifndef TOKENIZE_TESTCASE
+	#define TOKENIZE_TESTCASE 0
+#endif
 
 /**
  * Split string by susequent spaces
@@ -81,12 +83,13 @@ int tokenize(parray* result, char* string, char* whitespace) {
 	return word;
 }
 
+#if TOKENIZE_TESTCASE == 1
 int main() {
 	
 	char *string = "module-name      @1.2.sdef				mod/submod";
 	parray* result = parray_init(sizeof(char), 10);
 	
-	int count = tokenize(result, string, " \t");
+	tokenize(result, string, " \t");
 	
 	//printf("count %d, length %ld\n", count, result->length);
 	char** e = (char**) result->elements;
@@ -102,3 +105,4 @@ int main() {
 	
 	return 0;
 }
+#endif
