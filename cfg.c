@@ -321,7 +321,18 @@ int parse_config_file(const char* filename) {
 		parray* tokens = parray_init(sizeof(char), 10);
 		tokenize(tokens, line, " \t");
 		
-		printf("num tokens: %ld -%s\n", tokens->length, line);
+		// FIXME: free allocated memory from tokenizer properly
+		
+		//printf("num tokens: %ld -%s\n", tokens->length, line);
+		if (tokens->length) {
+			printf("%ld:", tokens->length);
+			int i=0;
+			char** e = (char**) tokens->elements;
+			for (i=0; i<tokens->length; i++)
+				printf(" %s", e[i]);
+			printf("\n");
+		}
+		
 		line_pos = 0;
 		line[0] = '\0';
 		
