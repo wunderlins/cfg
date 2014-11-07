@@ -4,23 +4,23 @@
 typedef struct {
 	char* name;
 	char* value;
-} n;
+} node_simple_t;
 
 typedef struct {
 	char* name;
 	char* value;
 	int length;
 	void** children; // this is actually of type node_u, but it is declared further down
-} nlist;
+} node_list_t;
 
 typedef struct {
 	int length;
 	void** children; // this is actually of type node_u, but it is declared further down
-} rlist;
+} node_root_t;
 
 typedef union {
-	n node;
-	nlist list; // WTF: does root have to be listed here? might cause nasty problems but it works now. Strange.
+	node_simple_t node;
+	node_list_t list; // WTF: does root have to be listed here? might cause nasty problems but it works now. Strange.
 } node_u;
 
 typedef struct {

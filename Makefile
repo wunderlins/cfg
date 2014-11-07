@@ -1,4 +1,5 @@
-.PHONY: cfg parray.o tokenize tokenize.o
+.PHONY: cfg 
+#parray.o tokenize tokenize.o
 
 CC      = gcc
 #CCFLAGS = -Wall -O3 
