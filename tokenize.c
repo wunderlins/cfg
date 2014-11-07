@@ -31,7 +31,7 @@ int tokenize(parray* result, char* string, char* whitespace) {
 	int whitespace_length = strlen(whitespace);
 	
 	// loop over the array character by character
-	printf("str: %s\n", string);
+	//printf("str: %s\n", string);
 	for (i=0; i<length; i++) {
 		last = string[i];
 		

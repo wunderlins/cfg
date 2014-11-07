@@ -6,8 +6,8 @@ RM      = rm
 
 all: cfg
 
-cfg:
-	$(CC) $(CCFLAGS) -o cfg cfg.c
+cfg: parray.o tokenize.o
+	$(CC) $(CCFLAGS) parray.o tokenize.o -o cfg cfg.c
 
 parray.o:
 	$(CC) $(CCFLAGS) -c parray.c

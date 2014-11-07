@@ -9,6 +9,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "parray.h"
+#include "tokenize.h"
 
 static int nodeid = 0;
 
@@ -304,8 +305,6 @@ int parse_config_file(const char* filename) {
 	char c;
 	char line[1024] = "";
 	int line_pos = 0;
-	int first_space = -1;
-	int found_char = -1;
 	
 	while ((c = fgetc(fp)) != EOF) {
 		
@@ -314,31 +313,20 @@ int parse_config_file(const char* filename) {
 			//printf("%d %c ", line_pos, c);
 			line[line_pos] = c;
 			line[line_pos+1] = '\0';
-			
-			if (found_char == -1) {
-				if (c != ' ' && c != '\t' && c != '\n' && c != '\r')
-					found_char = line_pos;
-			} else {
-				if ((c == ' ' || c == '\t') && first_space == -1)
-					first_space = line_pos;
-			}
-			
 			line_pos++;
 			
 			continue;
 		}
 		
+		parray* tokens = parray_init(sizeof(char), 10);
+		tokenize(tokens, line, " \t");
 		
-		printf("%d %d -%s\n", found_char, first_space, line);
+		printf("num tokens: %ld -%s\n", tokens->length, line);
 		line_pos = 0;
-		first_space = -1;
-		found_char = -1;
 		line[0] = '\0';
-		
 		
 		// printf("%c", c);
 	}
-	
 	
 	// close file handle
 	int ret = fclose(fp);
