@@ -11,23 +11,10 @@
 
 
 #ifndef __PARRAY_H__
+#define __PARRAY_H__
 
 #define PARRAY_ERR_MAX 6
 #define PARRAY_ERR_LENGTH 50
-
-/**
- * Error messages
- */
-const char _parray_errstr[PARRAY_ERR_MAX][PARRAY_ERR_LENGTH] = {
-	/*  0 */ "",
-	/*  1 */ "Failed to allocate memory",
-	/*  2 */ "_parray_expand failed",
-	/*  3 */ "Internal string length too short for input",
-	/*  4 */ "remove failed, index larger than array size",
-	/*  5 */ "Unknown error number",
-};
-
-int _parray_errno = 0;
 
 /**
  * This structure holds an array of pointers including the number of items
@@ -45,6 +32,4 @@ size_t parray_set(parray* p, void* element, size_t pos); // if pos == 0, append
 const char* parray_errstr();
 //size_t parray_free(parray* p);
 
-
-#define __PARRAY_H__
 #endif

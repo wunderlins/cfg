@@ -14,6 +14,20 @@
 #include "parray.h"
 
 /**
+ * Error messages
+ */
+const char _parray_errstr[PARRAY_ERR_MAX][PARRAY_ERR_LENGTH] = {
+	/*  0 */ "",
+	/*  1 */ "Failed to allocate memory",
+	/*  2 */ "_parray_expand failed",
+	/*  3 */ "Internal string length too short for input",
+	/*  4 */ "remove failed, index larger than array size",
+	/*  5 */ "Unknown error number",
+};
+
+int _parray_errno = 0;
+
+/**
  * Make storage larger
  *
  * This function will automatically enlarge ->elements if required. The value use
@@ -103,6 +117,10 @@ parray* parray_init(size_t psize, size_t expand) {
  */
 size_t parray_set(parray* v, void* element, size_t pos) {
 	_parray_errno = 0;
+	
+	// append if pos == 0
+	if (pos == 0)
+		pos = v->length;
 	
 	// expand array if required
 	while (pos >= v->allocated) {
