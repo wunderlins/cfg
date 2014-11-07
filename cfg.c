@@ -10,42 +10,9 @@
 #include <stdlib.h>
 #include "parray.h"
 #include "tokenize.h"
+#include "cfg.h"
 
 static int nodeid = 0;
-
-typedef struct {
-	char* name;
-	char* value;
-} n;
-
-typedef struct {
-	char* name;
-	char* value;
-	int length;
-	void** children; // this is actually of type node_u, but it is declared further down
-} nlist;
-
-typedef struct {
-	int length;
-	void** children; // this is actually of type node_u, but it is declared further down
-} rlist;
-
-typedef union {
-	n node;
-	nlist list; // WTF: does root have to be listed here? might cause nasty problems but it works now. Strange.
-} node_u;
-
-typedef struct {
-	int nodeid;
-	int has_children;
-	enum {
-		UNDEF,   // 0
-		ROOT,    // 1
-		NODE,    // 2
-		NODELIST // 3
-	} type;
-	node_u* data;
-} node_t;
 
 node_t* init_node(char* name, char* value) {
 	node_t* n = malloc(sizeof(node_t));
@@ -328,11 +295,11 @@ int parse_config_file(const char* filename) {
 		
 		// debug output of all tokens
 		if (tokens->length) {
-			printf("%ld:", tokens->length);
+			printf("%ld", tokens->length);
 			int i=0;
 			char** e = (char**) tokens->elements;
 			for (i=0; i<tokens->length; i++)
-				printf(" %s", e[i]);
+				printf("|%s", e[i]);
 			printf("\n");
 		}
 		
