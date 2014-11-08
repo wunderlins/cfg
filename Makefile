@@ -1,7 +1,7 @@
-.PHONY: cfg 
-#parray.o tokenize tokenize.o
+.PHONY: cfg # parray.o tokenize tokenize.o
 
-CC      = gcc
+#CC      = gcc
+#CC      = clang
 #CCFLAGS = -Wall -O3 
 CCFLAGS = -Wall -g -O0 
 RM      = rm

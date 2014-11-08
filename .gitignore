@@ -30,3 +30,4 @@ cfg
 *.x86_64
 *.hex
 tokenize
+cfg.plist
