@@ -63,6 +63,7 @@ int node_append(node_t* nodelist, node_t* node) {
 			return 2;
 	} else {
 		// realloc
+		// FIXME: length + 1? ordo length++ before allocating!
 		nodelist->data->list.children = 
 				realloc(nodelist->data->list.children, 
 				sizeof(node_t) * nodelist->data->list.length);
