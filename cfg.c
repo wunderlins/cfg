@@ -255,7 +255,7 @@ int parse_config_file(const char* filename) {
 		return 2;
 	}
 	
-	node_t* root = init_root();
+	node_t* root = init_root(); // the root node
 	
 	// parse file
 	// 
@@ -273,6 +273,19 @@ int parse_config_file(const char* filename) {
 	char c;
 	char line[1024] = "";
 	int line_pos = 0;
+	
+	// pointer to the current node in the parser queue
+	node_t* current = root;
+	
+	// create stack of nodes for tags. Whenever a new opening
+	// tag is encountered add the new tag at the end of the stack.
+	// when a tag is closed, remove the last tag (null) and update the 
+	// stack length.
+	struct {
+		int length;
+		node_t** items;
+	} stack;
+	stack.length = 0;
 	
 	while ((c = fgetc(fp)) != EOF) {
 		
@@ -292,7 +305,52 @@ int parse_config_file(const char* filename) {
 		parray* tokens = parray_init(sizeof(char), 10);
 		tokenize(tokens, line, " \t");
 		
+		line_pos = 0;
+		line[0] = '\0';
+		
+		if (tokens->length == 0)
+			continue;
+		
 		// TODO: generate tokens also for white space
+		
+		// parse line and create node
+		char** t = (char**) tokens->elements;
+		//printf("[%ld] ", tokens->length);
+		if (t[0][0] == '<' && t[0][1] == '/') {
+			printf(" close ");
+			
+			// check for syntax errors
+#define PARSER_ERR_TOOMANYCLOSE 128 
+			if (stack.length == 0)
+				return PARSER_ERR_TOOMANYCLOSE;
+			
+#define PARSER_ERR_TAGMISMATCH 129
+			// check for tag mismatch, case sensitive
+			if (strcmp(current->data->list.name, 
+					       stack.items[stack.length-1]->data->list.name) != 0)
+				return PARSER_ERR_TAGMISMATCH;
+			
+			// "remove" (forget) last tag on the stack
+			stack.length--;
+			
+			
+		} else if (t[0][0] == '<') {
+			printf(" open ");
+			
+			// new nodelist
+			char** e = (char**) tokens->elements;
+			node_t* n = init_nodelist(e[0], e[1]);
+			// FIXME: check for malloc errors
+			stack.items[stack.length] = n;
+			stack.length++;
+			current = n;
+			
+		} else {
+			printf(" node ");
+			
+			// check that node can have children
+			// TODO: just add a new node to the end of children
+		}
 		
 		// debug output of all tokens
 		if (tokens->length) {
@@ -304,14 +362,11 @@ int parse_config_file(const char* filename) {
 			printf("\n");
 		}
 		
-		line_pos = 0;
-		line[0] = '\0';
-		
 		// printf("%c", c);
 	}
 	
 	// FIXME: free allocated memory from tokenizer properly
-	
+
 	// close file handle
 	int ret = fclose(fp);
 	if (ret != 0) {
