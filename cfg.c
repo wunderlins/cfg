@@ -287,11 +287,11 @@ int parse_config_file(const char* filename) {
 	} stack;
 	stack.length = 0;
 	
-	while ((c = fgetc(fp)) != EOF) {
+	while ((c = fgetc(fp))) {
 		
 		// scan line by line
 		// FIXME: also take into account '\r' and "\r\n"
-		if (c != '\n') {
+		if (c != '\n' && c != EOF) {
 			//printf("%d %c ", line_pos, c);
 			line[line_pos] = c;
 			line[line_pos+1] = '\0';
@@ -299,6 +299,9 @@ int parse_config_file(const char* filename) {
 			
 			continue;
 		}
+		
+		if (c == EOF && line_pos == 0)
+			break;
 		
 		// split string by ' ' and '\t' and store it in a pointer array
 		// pointer type is char*
@@ -319,9 +322,16 @@ int parse_config_file(const char* filename) {
 		if (t[0][0] == '<' && t[0][1] == '/') {
 			printf(" close ");
 			
+			char** e = (char**) tokens->elements;
+			
+			// extract the tag name
+			char tag[100];
+			memcpy(tag, (e[0])+2, strlen(e[0])-3);
+			//printf("close tag '%s' ", tag);
+			
 			// check for syntax errors
 #define PARSER_ERR_TOOMANYCLOSE 128 
-			if (stack.length == 0)
+			if (stack.length < 0)
 				return PARSER_ERR_TOOMANYCLOSE;
 			
 #define PARSER_ERR_TAGMISMATCH 129
@@ -332,6 +342,7 @@ int parse_config_file(const char* filename) {
 			
 			// "remove" (forget) last tag on the stack
 			stack.length--;
+			current = stack.items[stack.length];
 			
 			
 		} else if (t[0][0] == '<') {
@@ -340,8 +351,20 @@ int parse_config_file(const char* filename) {
 			// new nodelist
 			//printf("Length: %ld ", tokens->length);
 			char** e = (char**) tokens->elements;
-			node_t* n = init_nodelist(e[0], e[1]);
-			//printf("nodelist.name %s %s ", n->data->list.name, n->data->list.value);
+			
+			// extract the tag name
+			char tag[100];
+			memcpy(tag, (e[0])+1, strlen(e[0])-1);
+			
+			// remove ending '>' if tag has not attributes
+			if (tag[strlen(tag)-1] == '>') {
+				tag[strlen(tag)-1] = '\0';
+				//printf("no attributes '%s' '%s' ", e[0], tag);
+			}
+			
+			node_t* n = init_nodelist(tag, e[1]);
+			printf("nodelist.name %s %s ", n->data->list.name, n->data->list.value);
+			node_append(current, n);
 			//printf("%s %s\n", e[0], e[1]);
 
 			// FIXME: check for malloc errors
@@ -356,6 +379,9 @@ int parse_config_file(const char* filename) {
 			
 			// check that node can have children
 			// TODO: just add a new node to the end of children
+			
+			node_t* n = init_node(t[0], t[1]);
+			node_append(current, n);
 		}
 		
 		
@@ -370,8 +396,12 @@ int parse_config_file(const char* filename) {
 		}
 		
 		
-		// printf("%c", c);
-	}
+		//printf("Stack length: %d\n", stack.length);
+	
+		
+		if (c == EOF)
+			break;
+	} // end while
 	
 	// FIXME: free allocated memory from tokenizer properly
 
@@ -382,6 +412,10 @@ int parse_config_file(const char* filename) {
 		perror("");
 		return 2;
 	}
+	
+	// dump the whole structure
+	printf("\nTREE\n\n");
+	node_dump(root, 0);
 	
 	return 0;
 }
