@@ -283,7 +283,7 @@ int parse_config_file(const char* filename) {
 	// stack length.
 	struct {
 		int length;
-		node_t** items;
+		node_t* items[1024];
 	} stack;
 	stack.length = 0;
 	
@@ -338,19 +338,26 @@ int parse_config_file(const char* filename) {
 			printf(" open ");
 			
 			// new nodelist
+			//printf("Length: %ld ", tokens->length);
 			char** e = (char**) tokens->elements;
 			node_t* n = init_nodelist(e[0], e[1]);
+			//printf("nodelist.name %s %s ", n->data->list.name, n->data->list.value);
+			//printf("%s %s\n", e[0], e[1]);
+
 			// FIXME: check for malloc errors
 			stack.items[stack.length] = n;
 			stack.length++;
 			current = n;
-			
+			/*
+			*/
+			printf("end open " );
 		} else {
 			printf(" node ");
 			
 			// check that node can have children
 			// TODO: just add a new node to the end of children
 		}
+		
 		
 		// debug output of all tokens
 		if (tokens->length) {
@@ -361,6 +368,7 @@ int parse_config_file(const char* filename) {
 				printf("|%s", e[i]);
 			printf("\n");
 		}
+		
 		
 		// printf("%c", c);
 	}
