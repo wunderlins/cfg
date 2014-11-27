@@ -305,29 +305,40 @@ int parse_config_file(const char* filename) {
 		
 		// split string by ' ' and '\t' and store it in a pointer array
 		// pointer type is char*
+		printf ("Allocating tokens\n");
 		parray* tokens = parray_init(sizeof(char), 10);
-		tokenize(tokens, line, " \t");
+#define PARSER_ERR_PARSETOKENS 125
+		if (tokens == NULL)
+			return PARSER_ERR_PARSETOKENS;
+		printf ("Parsing tokens\n");
+		int words = tokenize(tokens, line, " \t");
+		printf ("Parsed %d\n", words);
 		
 		line_pos = 0;
 		line[0] = '\0';
 		
-		if (tokens->length == 0)
+		if (tokens->length == 0) {
+			parray_free(tokens);
 			continue;
+		}
 		
 		// TODO: generate tokens also for white space
 		
 		// parse line and create node
 		char** t = (char**) tokens->elements;
 		//printf("[%ld] ", tokens->length);
+		printf("0x%d 0x%d", (int) t[0][0], (int) t[0][1]);
+		
 		if (t[0][0] == '<' && t[0][1] == '/') {
 			printf(" close ");
 			
 			char** e = (char**) tokens->elements;
 			
 			// extract the tag name
+			printf("copy tag data\n");
 			char tag[100];
 			memcpy(tag, (e[0])+2, strlen(e[0])-3);
-			//printf("close tag '%s' ", tag);
+			printf("close tag '%s' ", tag);
 			
 			// check for syntax errors
 #define PARSER_ERR_TOOMANYCLOSE 128 
@@ -364,7 +375,9 @@ int parse_config_file(const char* filename) {
 			
 			node_t* n = init_nodelist(tag, e[1]);
 			printf("nodelist.name %s %s ", n->data->list.name, n->data->list.value);
-			node_append(current, n);
+			int r = node_append(current, n);
+			if (r != 0)
+				return 130;
 			//printf("%s %s\n", e[0], e[1]);
 
 			// FIXME: check for malloc errors
@@ -373,7 +386,7 @@ int parse_config_file(const char* filename) {
 			current = n;
 			/*
 			*/
-			printf("end open " );
+			//printf("end open " );
 		} else {
 			printf(" node ");
 			
@@ -381,13 +394,17 @@ int parse_config_file(const char* filename) {
 			// TODO: just add a new node to the end of children
 			
 			node_t* n = init_node(t[0], t[1]);
-			node_append(current, n);
+			int r = node_append(current, n);
+			if (r != 0)
+				return 130;
+		
 		}
 		
 		
 		// debug output of all tokens
+		
 		if (tokens->length) {
-			printf("%ld", tokens->length);
+			printf("-> %ld", tokens->length);
 			int i=0;
 			char** e = (char**) tokens->elements;
 			for (i=0; i<tokens->length; i++)
@@ -396,7 +413,7 @@ int parse_config_file(const char* filename) {
 		}
 		
 		
-		//printf("Stack length: %d\n", stack.length);
+		printf("Stack length: %d\n", stack.length);
 	
 		
 		if (c == EOF)

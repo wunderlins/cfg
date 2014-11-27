@@ -30,6 +30,6 @@ typedef struct {
 parray* parray_init(size_t psize, size_t expand);
 size_t parray_set(parray* p, void* element, size_t pos); // if pos == 0, append
 const char* parray_errstr();
-//size_t parray_free(parray* p);
+size_t parray_free(parray* p);
 
 #endif

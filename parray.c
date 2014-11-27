@@ -159,3 +159,9 @@ const char* parray_errstr() {
 	return _parray_errstr[_parray_errno];
 }
 
+size_t parray_free(parray* p) {
+	free(p->elements);
+	free(p);
+	return 0;
+}
+
