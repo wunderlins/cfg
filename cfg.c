@@ -311,7 +311,13 @@ int parse_config_file(const char* filename) {
 		if (tokens == NULL)
 			return PARSER_ERR_PARSETOKENS;
 		printf ("Parsing tokens\n");
-		int words = tokenize(tokens, line, " \t");
+		int words = tokenize(tokens, line, " \t\n");
+		if (words == -1) {
+			printf("Error in tokenizer\n");
+#define PARSER_ERR_TOKENIZER 126
+			return PARSER_ERR_TOKENIZER;
+		}
+		
 		printf ("Parsed %d\n", words);
 		
 		line_pos = 0;

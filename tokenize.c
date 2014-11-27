@@ -55,10 +55,15 @@ int tokenize(parray* result, char* string, char* whitespace) {
 		
 		if (is_whitespace && buffer_l) {
 			// FIXME check for malloc errors
+			printf("A\n");
 			char* str = malloc(sizeof(char)*101);
 			strcpy(str, buffer);
-			// FIXME check for malloc errors
-			parray_set(result, str, 0);
+			printf("B\n");
+			
+			size_t r = parray_set(result, str, 0);
+			if(r == 0)
+				return -1;
+			printf("B1\n");
 			
 			// clear buffer
 			buffer[0] = '\0';
@@ -78,10 +83,14 @@ int tokenize(parray* result, char* string, char* whitespace) {
 	if (buffer[0] != '\0') {
 		//strcpy(result[word++], buffer);
 		// FIXME check for malloc errors
+		printf("C\n");
 		char* str = malloc(sizeof(char)*101);
 		strcpy(str, buffer);
-		// FIXME check for malloc errors
-		parray_set(result, str, 0);
+		printf("D\n");
+		
+		size_t r = parray_set(result, str, 0);
+		if(r == 0)
+			return -1;
 		word++;
 	}
 	
