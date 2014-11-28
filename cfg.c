@@ -329,6 +329,11 @@ int parse_config_file(const char* filename) {
 			continue;
 		}
 		
+		// TODO: remove trailing comments if any
+		
+		// TODO: concatenate all tokens except the tag name into one string again
+		// TODO: remove ending '>'
+		
 		// TODO: generate tokens also for white space
 		
 		// parse line and create node
@@ -368,17 +373,17 @@ int parse_config_file(const char* filename) {
 			stack.length--;
 			current = stack.items[stack.length-1];
 			
-			printf("close tag '%s', stack: %d, type: %d\n", tag, stack.length, current->type);
+			//printf("close tag '%s', stack: %d, type: %d\n", tag, stack.length, current->type);
 			
 		} else if (t[0][0] == '<') {
-			//printf(" open ");
+			printf(" open ");
 			
 			// new nodelist
 			//printf("Length: %ld ", tokens->length);
 			char** e = (char**) tokens->elements;
 			
 			// extract the tag name
-			char tag[100];
+			char* tag = malloc(sizeof(char)*100);
 			memcpy(tag, (e[0])+1, strlen(e[0])-1);
 			
 			// remove ending '>' if tag has not attributes
@@ -392,7 +397,7 @@ int parse_config_file(const char* filename) {
 			int r = node_append(current, n);
 			if (r != 0)
 				return 130;
-			//printf("%s %s\n", e[0], e[1]);
+			printf("%s %s\n", e[0], e[1]);
 
 			// FIXME: check for malloc errors
 			stack.items[stack.length] = n;
