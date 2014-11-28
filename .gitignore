@@ -31,3 +31,4 @@ cfg
 *.hex
 tokenize
 cfg.plist
+/Build (GNU)
