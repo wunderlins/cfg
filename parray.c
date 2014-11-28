@@ -124,7 +124,7 @@ size_t parray_set(parray* v, void* element, size_t pos) {
 		pos = v->length;
 	
 	// expand array if required
-	printf("pos: %d\n", pos);
+	//printf("pos: %d\n", pos);
 	while (pos >= v->allocated) {
 		// extend array
 		size_t r = _parray_expand(v);
