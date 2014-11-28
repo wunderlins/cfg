@@ -285,7 +285,8 @@ int parse_config_file(const char* filename) {
 		int length;
 		node_t* items[1024];
 	} stack;
-	stack.length = 0;
+	stack.items[0] = root;
+	stack.length = 1;
 	
 	while ((c = fgetc(fp))) {
 		
@@ -365,8 +366,9 @@ int parse_config_file(const char* filename) {
 			
 			// "remove" (forget) last tag on the stack
 			stack.length--;
-			current = stack.items[stack.length];
+			current = stack.items[stack.length-1];
 			
+			printf("close tag '%s', stack: %d, type: %d\n", tag, stack.length, current->type);
 			
 		} else if (t[0][0] == '<') {
 			//printf(" open ");

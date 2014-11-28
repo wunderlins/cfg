@@ -6,7 +6,7 @@
 CCFLAGS = -Wall -g -O0 
 RM      = rm
 
-all: cfg tokenize
+all: clean cfg tokenize
 
 debug:
 
@@ -31,5 +31,5 @@ clean:
 	$(RM) parray.o || true
 	$(RM) tokenize.o || true
 	$(RM) tokenize || true
-	$(RM) *~
+	$(RM) *~ || true
 
