@@ -92,6 +92,7 @@ parray* parray_init(size_t psize, size_t expand) {
 	v->length = 0;
 	v->expand = expand;
 	v->allocated = 0;
+	v->elements = NULL;
 	
 	//_parray_expand(v);
 	
@@ -161,7 +162,8 @@ const char* parray_errstr() {
 }
 
 size_t parray_free(parray* p) {
-	free(p->elements);
+	if (p->elements != NULL)
+		free(p->elements);
 	free(p);
 	return 0;
 }

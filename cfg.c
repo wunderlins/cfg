@@ -318,7 +318,7 @@ int parse_config_file(const char* filename) {
 			return PARSER_ERR_TOKENIZER;
 		}
 		
-		printf ("Parsed %d\n", words);
+		//printf ("Parsed %d\n", words);
 		
 		line_pos = 0;
 		line[0] = '\0';
