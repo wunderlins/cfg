@@ -14,6 +14,12 @@
 
 static int nodeid = 0;
 
+typedef struct {
+	int length;
+	node_t* items[1024];
+} stack_t;
+
+
 node_t* init_node(char* name, char* value) {
 	node_t* n = malloc(sizeof(node_t));
 	n->nodeid = nodeid++;
@@ -243,6 +249,86 @@ void test_createnode() {
 	
 }
 
+
+int parse_tokens(parray* tokens, stack_t* stack) {
+	
+	node_t* current = stack->items[(stack->length)-1];
+	char** t = (char**) tokens->elements;
+	
+	if (t[0][0] == '<' && t[0][1] == '/') {
+		//printf(" close ");
+		
+		char** e = (char**) tokens->elements;
+		
+		// extract the tag name
+		//printf("copy tag data\n");
+		char tag[100];
+		memcpy(tag, (e[0])+2, strlen(e[0])-3);
+		//printf("close tag '%s' ", tag);
+		
+		// check for syntax errors
+#define PARSER_ERR_TOOMANYCLOSE 128 
+		if (stack->length < 0)
+			return PARSER_ERR_TOOMANYCLOSE;
+		
+#define PARSER_ERR_TAGMISMATCH 129
+		// check for tag mismatch, case sensitive
+		if (strcmp(current->data->list.name, 
+				       stack->items[(stack->length)-1]->data->list.name) != 0)
+			return PARSER_ERR_TAGMISMATCH;
+		
+		// "remove" (forget) last tag on the stack
+		stack->length--;
+		current = stack->items[(stack->length)-1];
+		
+		//printf("close tag '%s', stack: %d, type: %d\n", tag, stack.length, current->type);
+		
+	} else if (t[0][0] == '<') {
+		printf(" open ");
+		
+		// new nodelist
+		//printf("Length: %ld ", tokens->length);
+		char** e = (char**) tokens->elements;
+		
+		// extract the tag name
+		char* tag = malloc(sizeof(char)*100);
+		memcpy(tag, (e[0])+1, strlen(e[0])-1);
+		
+		// remove ending '>' if tag has not attributes
+		if (tag[strlen(tag)-1] == '>') {
+			tag[strlen(tag)-1] = '\0';
+			//printf("no attributes '%s' '%s' ", e[0], tag);
+		}
+		
+		node_t* n = init_nodelist(tag, e[1]);
+		//printf("nodelist.name %s %s ", n->data->list.name, n->data->list.value);
+		int r = node_append(current, n);
+		if (r != 0)
+			return 130;
+		printf("%s %s\n", e[0], e[1]);
+
+		// FIXME: check for malloc errors
+		stack->items[stack->length] = n;
+		stack->length++;
+		current = n;
+		//printf("end open " );
+	} else {
+		//printf(" node ");
+		
+		// check that node can have children
+		// TODO: just add a new node to the end of children
+		
+		node_t* n = init_node(t[0], t[1]);
+		int r = node_append(current, n);
+		if (r != 0)
+			return 130;
+	
+	}
+	
+	return 0;
+}
+
+
 int parse_config_file(const char* filename) {
 	
 	printf("Parsing %s\n\n", filename);
@@ -275,16 +361,13 @@ int parse_config_file(const char* filename) {
 	int line_pos = 0;
 	
 	// pointer to the current node in the parser queue
-	node_t* current = root;
+	//node_t* current = root;
 	
 	// create stack of nodes for tags. Whenever a new opening
 	// tag is encountered add the new tag at the end of the stack.
 	// when a tag is closed, remove the last tag (null) and update the 
 	// stack length.
-	struct {
-		int length;
-		node_t* items[1024];
-	} stack;
+	stack_t stack;
 	stack.items[0] = root;
 	stack.length = 1;
 	
@@ -347,78 +430,9 @@ int parse_config_file(const char* filename) {
 			continue;
 		}
 		
-		if (t[0][0] == '<' && t[0][1] == '/') {
-			//printf(" close ");
-			
-			char** e = (char**) tokens->elements;
-			
-			// extract the tag name
-			//printf("copy tag data\n");
-			char tag[100];
-			memcpy(tag, (e[0])+2, strlen(e[0])-3);
-			//printf("close tag '%s' ", tag);
-			
-			// check for syntax errors
-#define PARSER_ERR_TOOMANYCLOSE 128 
-			if (stack.length < 0)
-				return PARSER_ERR_TOOMANYCLOSE;
-			
-#define PARSER_ERR_TAGMISMATCH 129
-			// check for tag mismatch, case sensitive
-			if (strcmp(current->data->list.name, 
-					       stack.items[stack.length-1]->data->list.name) != 0)
-				return PARSER_ERR_TAGMISMATCH;
-			
-			// "remove" (forget) last tag on the stack
-			stack.length--;
-			current = stack.items[stack.length-1];
-			
-			//printf("close tag '%s', stack: %d, type: %d\n", tag, stack.length, current->type);
-			
-		} else if (t[0][0] == '<') {
-			printf(" open ");
-			
-			// new nodelist
-			//printf("Length: %ld ", tokens->length);
-			char** e = (char**) tokens->elements;
-			
-			// extract the tag name
-			char* tag = malloc(sizeof(char)*100);
-			memcpy(tag, (e[0])+1, strlen(e[0])-1);
-			
-			// remove ending '>' if tag has not attributes
-			if (tag[strlen(tag)-1] == '>') {
-				tag[strlen(tag)-1] = '\0';
-				//printf("no attributes '%s' '%s' ", e[0], tag);
-			}
-			
-			node_t* n = init_nodelist(tag, e[1]);
-			//printf("nodelist.name %s %s ", n->data->list.name, n->data->list.value);
-			int r = node_append(current, n);
-			if (r != 0)
-				return 130;
-			printf("%s %s\n", e[0], e[1]);
-
-			// FIXME: check for malloc errors
-			stack.items[stack.length] = n;
-			stack.length++;
-			current = n;
-			/*
-			*/
-			//printf("end open " );
-		} else {
-			//printf(" node ");
-			
-			// check that node can have children
-			// TODO: just add a new node to the end of children
-			
-			node_t* n = init_node(t[0], t[1]);
-			int r = node_append(current, n);
-			if (r != 0)
-				return 130;
-		
-		}
-		
+		int ret = parse_tokens(tokens, &stack);
+		if (ret != 0)
+			return ret;
 		
 		// debug output of all tokens
 		/*
