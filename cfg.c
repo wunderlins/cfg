@@ -258,12 +258,13 @@ int parse_tokens(parray* tokens, stack_t* stack) {
 	if (t[0][0] == '<' && t[0][1] == '/') {
 		//printf(" close ");
 		
-		char** e = (char**) tokens->elements;
+		//char** e = (char**) tokens->elements;
 		
 		// extract the tag name
 		//printf("copy tag data\n");
+		//char* tag = malloc(sizeof(char)*strlen(t[0])+5);
 		char tag[100];
-		memcpy(tag, (e[0])+2, strlen(e[0])-3);
+		memcpy(tag, (t[0])+2, strlen(t[0])-3);
 		//printf("close tag '%s' ", tag);
 		
 		// check for syntax errors
@@ -288,11 +289,12 @@ int parse_tokens(parray* tokens, stack_t* stack) {
 		
 		// new nodelist
 		//printf("Length: %ld ", tokens->length);
-		char** e = (char**) tokens->elements;
+		//char** e = (char**) tokens->elements;
 		
 		// extract the tag name
+		//int l = strlen(t[0]);
 		char* tag = malloc(sizeof(char)*100);
-		memcpy(tag, (e[0])+1, strlen(e[0])-1);
+		memcpy(tag, (t[0])+1, strlen(t[0])-1);
 		
 		// remove ending '>' if tag has not attributes
 		if (tag[strlen(tag)-1] == '>') {
@@ -300,12 +302,12 @@ int parse_tokens(parray* tokens, stack_t* stack) {
 			//printf("no attributes '%s' '%s' ", e[0], tag);
 		}
 		
-		node_t* n = init_nodelist(tag, e[1]);
+		node_t* n = init_nodelist(tag, t[1]);
 		//printf("nodelist.name %s %s ", n->data->list.name, n->data->list.value);
 		int r = node_append(current, n);
 		if (r != 0)
 			return 130;
-		printf("%s %s\n", e[0], e[1]);
+		printf("%s %s\n", t[0], t[1]);
 
 		// FIXME: check for malloc errors
 		stack->items[stack->length] = n;
