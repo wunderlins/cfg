@@ -17,7 +17,7 @@ static int nodeid = 0;
 typedef struct {
 	int length;
 	node_t* items[1024];
-} stack_t;
+} pstack_t;
 
 
 node_t* init_node(char* name, char* value) {
@@ -250,7 +250,7 @@ void test_createnode() {
 }
 
 
-int parse_tokens(parray* tokens, stack_t* stack) {
+int parse_tokens(parray* tokens, pstack_t* stack) {
 	
 	node_t* current = stack->items[(stack->length)-1];
 	char** t = (char**) tokens->elements;
@@ -369,7 +369,7 @@ int parse_config_file(const char* filename) {
 	// tag is encountered add the new tag at the end of the stack.
 	// when a tag is closed, remove the last tag (null) and update the 
 	// stack length.
-	stack_t stack;
+	pstack_t stack;
 	stack.items[0] = root;
 	stack.length = 1;
 	
